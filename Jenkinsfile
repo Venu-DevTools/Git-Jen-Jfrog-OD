@@ -4,8 +4,8 @@ pipeline {
     environment {
         PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"
         MAVEN_HOME = tool 'Maven3'
-        JFROG_CLI_PATH = '/usr/local/bin/jf' // Path to JFrog CLI
-        JFROG_SERVER_ID = 'jfrog-server'     // JFrog server ID configured in Jenkins
+        JFROG_CLI_PATH = '/usr/local/bin/jf' // Ensure this path is correct
+        JFROG_SERVER_ID = 'jfrog-server'     // Ensure this matches your JFrog CLI configuration
         JFROG_REPO = 'simple-local'          // Target Artifactory repository
         ORG_PATH = 'MyProject'               // Organization path
         MODULE = 'hello-world'               // Module name
@@ -45,8 +45,6 @@ pipeline {
                     sh """
                         ${JFROG_CLI_PATH} rt upload \
                         --server-id=${JFROG_SERVER_ID} \
-                        --build-name=${JOB_NAME} \
-                        --build-number=${BUILD_NUMBER} \
                         "target/${ARTIFACT_NAME}" \
                         "${JFROG_REPO}/${ORG_PATH}/${MODULE}-${PACKAGE_VERSION}.jar"
                     """
