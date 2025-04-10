@@ -11,7 +11,7 @@ pipeline {
         MODULE = 'hello-world'            // Module name
         ARTIFACT_NAME = "${MODULE}-${PACKAGE_VERSION}.jar"
         JFROG_CLI_BUILD_NAME = "${JOB_NAME}"
-        JFROG_CLI_BUILD_NUMBER = "${BUILD_NUMBER}"
+        JFROG_CLI_BUILD_NUMBER = "${BUILD_NUMBER}"  
     }
 
     stages {
