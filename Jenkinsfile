@@ -4,7 +4,7 @@ pipeline {
     environment {
         PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"
         MAVEN_HOME = tool 'Maven3'
-        JFROG_CLI_HOME = tool 'jfrogcli'             // <-- your configured JFrog CLI tool
+        JFROG_CLI_HOME = tool 'jfrogcli'             // <-- your configured JFrog CLItool
         JFROG_SERVER_ID = 'jfserver'                 // <-- your configured server ID
         JFROG_REPO = 'simple-local'
         ORG_PATH = 'MyProject'
