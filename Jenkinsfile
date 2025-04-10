@@ -41,7 +41,7 @@ pipeline {
 
                         // Configure JFrog CLI with credentials (basic-auth-only to avoid encryption error)
                         sh '''
-                            echo y | ${jfrogCli} config add ${JFROG_SERVER_ID} \
+                            ${jfrogCli} config add ${JFROG_SERVER_ID} \
                                 --url=http://130.131.164.192:8082/artifactory \
                                 --user=$JF_USER \
                                 --password=$JF_PASS \
