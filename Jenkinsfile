@@ -4,7 +4,7 @@ pipeline {
     environment {
         PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"
         MAVEN_HOME = tool 'Maven3'
-        JFROG_CLI_HOME = tool 'JFrogCLI' // Ensure 'jfrog-cli' is configured in Jenkins Global Tool Configuration
+        JFROG_CLI_HOME = tool 'JFrogCLI' // Ensure 'jfrog-cli' is configured in Jenkins Global Tool Configuratio
         JFROG_SERVER_ID = 'jfrog-server'  // Ensure this matches the server ID configured in JFrog CLI
         JFROG_REPO = 'simple-local'       // Target Artifactory repositor
         ORG_PATH = 'MyProject'            // Organization path
