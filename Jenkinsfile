@@ -4,6 +4,12 @@ pipeline {
     environment {
         PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"
         MAVEN_HOME = tool 'Maven3'
+        JFROG_CLI_PATH = '/usr/local/bin/jf' // Path to JFrog CLI
+        JFROG_SERVER_ID = 'jfrog-server'     // JFrog server ID configured in Jenkins
+        JFROG_REPO = 'simple-local'          // Target Artifactory repository
+        ORG_PATH = 'MyProject'               // Organization path
+        MODULE = 'hello-world'               // Module name
+        ARTIFACT_NAME = "${MODULE}-${PACKAGE_VERSION}.jar"
     }
 
     stages {
@@ -15,29 +21,38 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                sh "${MAVEN_HOME}/bin/mvn clean package -Djar.finalName=hello-world.${PACKAGE_VERSION}"
+                sh "${MAVEN_HOME}/bin/mvn clean package -Djar.finalName=${MODULE}-${PACKAGE_VERSION}"
             }
         }
 
         stage('Archive JAR') {
             steps {
-                archiveArtifacts artifacts: "target/hello-world.${PACKAGE_VERSION}.jar", fingerprint: true
+                archiveArtifacts artifacts: "target/${ARTIFACT_NAME}", fingerprint: true
             }
         }
 
         stage('Upload to JFrog Artifactory') {
             steps {
                 script {
-                    def server = Artifactory.server 'jfrog-server' // Use your configured Server ID
-                    def uploadSpec = """{
-                        "files": [
-                            {
-                                "pattern": "target/hello-world.${PACKAGE_VERSION}.jar",
-                                "target": "simple-local/MyProject/hello-world-${PACKAGE_VERSION}.jar"
-                            }
-                        ]
-                    }"""
-                    server.upload(spec: uploadSpec)
+                    // Configure JFrog CLI with the server ID if not already configured
+                    sh """
+                        if ! ${JFROG_CLI_PATH} config show ${JFROG_SERVER_ID} > /dev/null 2>&1; then
+                            ${JFROG_CLI_PATH} config add ${JFROG_SERVER_ID} --interactive=false
+                        fi
+                    """
+
+                    // Upload the artifact to Artifactory using the specified layout
+                    sh """
+                        ${JFROG_CLI_PATH} rt upload \
+                        --server-id=${JFROG_SERVER_ID} \
+                        --build-name=${JOB_NAME} \
+                        --build-number=${BUILD_NUMBER} \
+                        "target/${ARTIFACT_NAME}" \
+                        "${JFROG_REPO}/${ORG_PATH}/${MODULE}-${PACKAGE_VERSION}.jar"
+                    """
+
+                    // Publish build information to Artifactory
+                    sh "${JFROG_CLI_PATH} rt build-publish ${JOB_NAME} ${BUILD_NUMBER}"
                 }
             }
         }
