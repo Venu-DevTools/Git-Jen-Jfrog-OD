@@ -39,14 +39,15 @@ pipeline {
                     script {
                         def jfrogCli = "${JFROG_CLI_HOME}/jf"
 
-                        // Configure JFrog CLI with credentials
-                        sh """
-                            ${jfrogCli} config add ${JFROG_SERVER_ID} \\
-                                --url=http://130.131.164.192:8082/artifactory \\
-                                --user=$JF_USER \\
-                                --password=$JF_PASS \\
-                                --interactive=false
-                        """
+                        // Configure JFrog CLI with credentials (basic-auth-only to avoid encryption error)
+                        sh '''
+                            echo y | ${jfrogCli} config add ${JFROG_SERVER_ID} \
+                                --url=http://130.131.164.192:8082/artifactory \
+                                --user=$JF_USER \
+                                --password=$JF_PASS \
+                                --interactive=false \
+                                --basic-auth-only
+                        '''
 
                         // Upload the JAR
                         sh "${jfrogCli} rt upload target/${ARTIFACT_NAME} ${JFROG_REPO}/${ORG_PATH}/ --server-id=${JFROG_SERVER_ID}"
