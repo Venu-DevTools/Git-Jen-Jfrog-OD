@@ -40,7 +40,7 @@ pipeline {
                     def jfrogCli = "${JFROG_CLI_HOME}/jf"
 
                     // Upload the artifact to Artifactory
-                    sh "${jfrogCli} rt upload --url=http://130.131.164.192:8082/artifactory --server-id=${JFROG_SERVER_ID} target/${ARTIFACT_NAME} ${JFROG_REPO}/${ORG_PATH}/${MODULE}-${PACKAGE_VERSION}.jar"
+                    sh "${jfrogCli} rt upload --server-id=${JFROG_SERVER_ID} target/${ARTIFACT_NAME} ${JFROG_REPO}/${ORG_PATH}/${MODULE}-${PACKAGE_VERSION}.jar"
 
 
                     // Publish build information to Artifactory
