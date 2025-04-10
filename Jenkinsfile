@@ -4,11 +4,11 @@ pipeline {
     environment {
         PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"
         MAVEN_HOME = tool 'Maven3'
-        JFROG_CLI_HOME = tool 'JFrogCLI' // Ensure 'jfrog-cli' is configured in Jenkins Global Tool Configuratio
-        JFROG_SERVER_ID = 'jfrogserver'  // Ensure this matches the server ID configured in JFrog CLI
-        JFROG_REPO = 'simple-local'       // Target Artifactory repositor
-        ORG_PATH = 'MyProject'            // Organization path
-        MODULE = 'hello-world'            // Module name
+        JFROG_CLI_HOME = tool 'JFrogCLI'
+        JFROG_SERVER_ID = 'jfrogserver'
+        JFROG_REPO = 'simple-local'
+        ORG_PATH = 'MyProject'
+        MODULE = 'hello-world'
         ARTIFACT_NAME = "${MODULE}-${PACKAGE_VERSION}.jar"
         JFROG_CLI_BUILD_NAME = "${JOB_NAME}"
         JFROG_CLI_BUILD_NUMBER = "${BUILD_NUMBER}"  
@@ -33,17 +33,27 @@ pipeline {
             }
         }
 
+        stage('Configure JFrog CLI') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'jfrog-creds', usernameVariable: 'JFROG_USER', passwordVariable: 'JFROG_PASS')]) {
+                    sh '''
+                        jf config add jfrogserver \
+                            --url=http://130.131.164.192:8082 \
+                            --user=$JFROG_USER \
+                            --password=$JFROG_PASS \
+                            --interactive=false
+                    '''
+                }
+            }
+        }
+
         stage('Upload to JFrog Artifactory') {
             steps {
                 script {
-                    // Set JFrog CLI executable path
                     def jfrogCli = "${JFROG_CLI_HOME}/jf"
 
-                    // Upload the artifact to Artifactory
                     sh "${jfrogCli} rt upload --server-id=${JFROG_SERVER_ID} target/${ARTIFACT_NAME} ${JFROG_REPO}/${ORG_PATH}/${MODULE}-${PACKAGE_VERSION}.jar"
 
-
-                    // Publish build information to Artifactory
                     sh "${jfrogCli} rt build-publish --server-id=${JFROG_SERVER_ID} ${JFROG_CLI_BUILD_NAME} ${JFROG_CLI_BUILD_NUMBER}"
                 }
             }
