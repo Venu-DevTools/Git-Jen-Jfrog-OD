@@ -7,7 +7,7 @@ pipeline {
         MAVEN_HOME = tool 'Maven3'
         JFROG_REPO = 'simple-local'
         ORG_PATH = 'MyProject'
-        MODULE = 'hello-world'
+        MODULE = 'hello-world' 
         ARTIFACT_NAME = "${MODULE}-${PACKAGE_VERSION}.jar"
 
         // Octopus deployment environment
