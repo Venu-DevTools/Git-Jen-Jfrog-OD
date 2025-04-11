@@ -85,7 +85,8 @@ pipeline {
                         --apiKey ${OCTO_API_KEY} \
                         --space "${OCTOPUS_SPACE}" \
                         --deployTo "${OCTOPUS_ENVIRONMENT}" \
-                        --progress
+                        --progress \
+                        --deploymenttimeout=1800
                     '''
                 }
             }
