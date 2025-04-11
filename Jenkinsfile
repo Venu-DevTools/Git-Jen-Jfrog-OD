@@ -2,12 +2,20 @@ pipeline {
     agent any
 
     environment {
+        // Common build environment
         PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"
         MAVEN_HOME = tool 'Maven3'
         JFROG_REPO = 'simple-local'
         ORG_PATH = 'MyProject'
         MODULE = 'hello-world'
         ARTIFACT_NAME = "${MODULE}-${PACKAGE_VERSION}.jar"
+
+        // Octopus deployment environment
+        OCTOPUS_API_KEY = credentials('octopus-api-key')
+        OCTOPUS_PROJECT = 'helloworld'
+        OCTOPUS_SPACE = 'firefist'
+        OCTOPUS_ENVIRONMENT = 'development'
+        OCTOPUS_SERVER = 'https://devtools.octopus.app/'
     }
 
     stages {
@@ -26,21 +34,59 @@ pipeline {
         stage('Deploy to Artifactory') {
             steps {
                 script {
-                    def server = Artifactory.server 'Jfserver' // Server ID from Jenkins > Configure System
-
+                    def server = Artifactory.server 'Jfserver'
                     def buildInfo = Artifactory.newBuildInfo()
 
-                    def uploadSpec = '''{
+                    def uploadSpec = """{
                         "files": [
                             {
                                 "pattern": "target/${ARTIFACT_NAME}",
                                 "target": "${JFROG_REPO}/${ORG_PATH}/"
                             }
                         ]
-                    }'''
+                    }"""
 
                     server.upload spec: uploadSpec, buildInfo: buildInfo
                     server.publishBuildInfo buildInfo
+                }
+            }
+        }
+
+        stage('Archive JAR') {
+            steps {
+                archiveArtifacts artifacts: "target/${ARTIFACT_NAME}", fingerprint: true
+            }
+        }
+
+        stage('Create Release in Octopus') {
+            steps {
+                withEnv(["OCTO_API_KEY=${OCTOPUS_API_KEY}"]) {
+                    sh """
+                        octo create-release \
+                        --project "${OCTOPUS_PROJECT}" \
+                        --version ${PACKAGE_VERSION} \
+                        --server ${OCTOPUS_SERVER} \
+                        --apiKey ${OCTO_API_KEY} \
+                        --space "${OCTOPUS_SPACE}" \
+                        --package MyProject/hello-world:${PACKAGE_VERSION}
+                    """
+                }
+            }
+        }
+
+        stage('Deploy Release to Environment') {
+            steps {
+                withEnv(["OCTO_API_KEY=${OCTOPUS_API_KEY}"]) {
+                    sh """
+                        octo deploy-release \
+                        --project "${OCTOPUS_PROJECT}" \
+                        --version ${PACKAGE_VERSION} \
+                        --server ${OCTOPUS_SERVER} \
+                        --apiKey ${OCTO_API_KEY} \
+                        --space "${OCTOPUS_SPACE}" \
+                        --deployTo "${OCTOPUS_ENVIRONMENT}" \
+                        --progress
+                    """
                 }
             }
         }
