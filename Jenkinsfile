@@ -61,15 +61,15 @@ pipeline {
         stage('Create Release in Octopus') {
             steps {
                 withEnv(["OCTO_API_KEY=${OCTOPUS_API_KEY}"]) {
-                    sh """
+                    sh '''
                         octo create-release \
                         --project "${OCTOPUS_PROJECT}" \
                         --version ${PACKAGE_VERSION} \
                         --server ${OCTOPUS_SERVER} \
                         --apiKey ${OCTO_API_KEY} \
                         --space "${OCTOPUS_SPACE}" \
-                        
-                    """
+                        --package MyProject/hello-world:$PACKAGE_VERSION
+                    '''
                 }
             }
         }
@@ -77,7 +77,7 @@ pipeline {
         stage('Deploy Release to Environment') {
             steps {
                 withEnv(["OCTO_API_KEY=${OCTOPUS_API_KEY}"]) {
-                    sh """
+                    sh '''
                         octo deploy-release \
                         --project "${OCTOPUS_PROJECT}" \
                         --version ${PACKAGE_VERSION} \
@@ -86,7 +86,7 @@ pipeline {
                         --space "${OCTOPUS_SPACE}" \
                         --deployTo "${OCTOPUS_ENVIRONMENT}" \
                         --progress
-                    """
+                    '''
                 }
             }
         }
