@@ -9,7 +9,7 @@ pipeline {
         ORG_PATH = 'MyProject'
         MODULE = 'hello-world' 
         ARTIFACT_NAME = "${MODULE}-${PACKAGE_VERSION}.jar"
-
+ 
         // Octopus deployment environment
         OCTOPUS_API_KEY = credentials('octopus-api-key')
         OCTOPUS_PROJECT = 'helloworld'
