@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Common build environment
-        PACKAGE_VERSION = "1.0.${BUILD_NUMBER}" 
+        PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"  
         MAVEN_HOME = tool 'Maven3'
         JFROG_REPO = 'simple-local'
         ORG_PATH = 'MyProject'
