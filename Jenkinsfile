@@ -6,7 +6,7 @@ pipeline {
         PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"   
         MAVEN_HOME = tool 'Maven3'
         JFROG_REPO = 'simple-local'
-        ORG_PATH = 'MyProject'
+        ORG_PATH = 'MyProject' 
         MODULE = 'hello-world' 
         ARTIFACT_NAME = "${MODULE}-${PACKAGE_VERSION}.jar"
     }
