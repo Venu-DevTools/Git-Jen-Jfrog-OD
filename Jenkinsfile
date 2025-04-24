@@ -48,13 +48,11 @@ pipeline {
         stage('Push Build Info to Octopus') {
             steps {
                 octopusPushBuildInformation(
-                    serverId: 'my-octopus-server',   // 🔁 Replace if your server ID is different
-                    spaceId: 'firefist',             // Set this to your actual Octopus Space
-                    packageVersion: "${PACKAGE_VERSION}",
-                    buildEnvironment: 'jenkins',
-                    buildNumber: "${BUILD_NUMBER}",
-                    buildUrl: "${env.BUILD_URL}",
-                    toolId: 'OctoCLI'                // Ensure this matches your Octopus CLI tool ID
+                    serverId: 'octopus-server',       // Your Octopus Deploy Jenkins config ID
+                    spaceId: 'firefist',              // Your Octopus space
+                    toolId: 'OctoCLI',                // Your Octopus CLI tool ID
+                    packageId: 'hello-world',         // Your package ID (must match the artifact ID)
+                    packageVersion: "${PACKAGE_VERSION}"
                 )
             }
         }
