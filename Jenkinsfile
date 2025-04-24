@@ -9,13 +9,6 @@ pipeline {
         ORG_PATH = 'MyProject'
         MODULE = 'hello-world' 
         ARTIFACT_NAME = "${MODULE}-${PACKAGE_VERSION}.jar"
- 
-        // Octopus deployment environment
-        OCTOPUS_API_KEY = credentials('octopus-api-key')
-        OCTOPUS_PROJECT = 'helloworld'
-        OCTOPUS_SPACE = 'firefist'
-        OCTOPUS_ENVIRONMENT = 'development'
-        OCTOPUS_SERVER = 'https://devtools.octopus.app/'
     }
 
     stages {
@@ -52,43 +45,23 @@ pipeline {
             }
         }
 
+        stage('Push Build Info to Octopus') {
+            steps {
+                octopusPushBuildInformation(
+                    serverId: 'my-octopus-server',   // 🔁 Replace if your server ID is different
+                    spaceId: 'firefist',             // Set this to your actual Octopus Space
+                    packageVersion: "${PACKAGE_VERSION}",
+                    buildEnvironment: 'jenkins',
+                    buildNumber: "${BUILD_NUMBER}",
+                    buildUrl: "${env.BUILD_URL}",
+                    toolId: 'OctoCLI'                // Ensure this matches your Octopus CLI tool ID
+                )
+            }
+        }
+
         stage('Archive JAR') {
             steps {
                 archiveArtifacts artifacts: "target/${ARTIFACT_NAME}", fingerprint: true
-            }
-        }
-
-        stage('Create Release in Octopus') {
-            steps {
-                withEnv(["OCTO_API_KEY=${OCTOPUS_API_KEY}"]) {
-                    sh '''
-                        octo create-release \
-                        --project "${OCTOPUS_PROJECT}" \
-                        --version ${PACKAGE_VERSION} \
-                        --server ${OCTOPUS_SERVER} \
-                        --apiKey ${OCTO_API_KEY} \
-                        --space "${OCTOPUS_SPACE}" \
-                        --packageVersion ${PACKAGE_VERSION}
-                    '''
-                }
-            }
-        }
-
-        stage('Deploy Release to Environment') {
-            steps {
-                withEnv(["OCTO_API_KEY=${OCTOPUS_API_KEY}"]) {
-                    sh '''
-                        octo deploy-release \
-                        --project "${OCTOPUS_PROJECT}" \
-                        --version ${PACKAGE_VERSION} \
-                        --server ${OCTOPUS_SERVER} \
-                        --apiKey ${OCTO_API_KEY} \
-                        --space "${OCTOPUS_SPACE}" \
-                        --deployTo "${OCTOPUS_ENVIRONMENT}" \
-                        --progress \
-                        --deploymenttimeout=1800
-                    '''
-                }
             }
         }
     }
