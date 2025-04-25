@@ -55,6 +55,7 @@ pipeline {
                 packageVersion: "${PACKAGE_VERSION}",
                 commentParser: '',                   // Leave blank if you're not using issue tracking
                 overwriteMode: 'OverwriteExisting'   // Allow Jenkins to overwrite build info if needed
+                additionalArgs: '--project "helloworld"
         )
     }
 }
