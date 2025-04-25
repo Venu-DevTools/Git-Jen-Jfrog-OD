@@ -45,19 +45,20 @@ pipeline {
             }
         }
 
-        stage('Push Build Info to Octopus') {
-            steps {
-                octopusPushBuildInformation(
-                    serverId: 'octopus-server',          // Your Octopus server ID
-                    spaceId: 'firefist',                 // Your Octopus space ID
-                    toolId: 'OctoCLI',                   // Octopus CLI tool ID
-                    packageId: 'hello-world',            // Package ID for the Octopus project
-                    packageVersion: "${PACKAGE_VERSION}",
-                    commentParser: '',                   // Leave blank if you're not using issue tracking
-                    overwriteMode: 'OverwriteExisting'   // Allow Jenkins to overwrite build info if needed
-                )
-            }
-        }
+    stage('Push Build Info to Octopus') {
+        steps {
+            octopusPushBuildInformation(
+                serverId: 'octopus-server',          // Your Octopus server ID
+                spaceId: 'firefist',                 // Your Octopus space ID
+                toolId: 'OctoCLI',                   // Octopus CLI tool ID
+                packageId: 'MyProject/hello-world',  // Updated Package ID to match JFrog format
+                packageVersion: "${PACKAGE_VERSION}",
+                commentParser: '',                   // Leave blank if you're not using issue tracking
+                overwriteMode: 'OverwriteExisting'   // Allow Jenkins to overwrite build info if needed
+        )
+    }
+}
+
 
         stage('Archive JAR') {
             steps {
