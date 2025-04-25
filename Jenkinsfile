@@ -77,7 +77,7 @@ pipeline {
                         packageVersion: "${PACKAGE_VERSION}",
                         commentParser: '',
                         overwriteMode: 'OverwriteExisting',
-                        additionalArgs: '--file="build-info.json"'
+                        additionalArgs: '--file="build-info.json" --logLevel=verbose'
                     )
                 }
             }
