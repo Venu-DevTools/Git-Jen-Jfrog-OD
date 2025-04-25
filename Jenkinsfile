@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        // Common build environment
-        PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"   
+        PACKAGE_VERSION = "1.0.${BUILD_NUMBER}"
         MAVEN_HOME = tool 'Maven3'
         JFROG_REPO = 'simple-local'
-        ORG_PATH = 'MyProject' 
-        MODULE = 'hello-world' 
+        ORG_PATH = 'MyProject'
+        MODULE = 'hello-world'
         ARTIFACT_NAME = "${MODULE}-${PACKAGE_VERSION}.jar"
     }
 
@@ -45,21 +44,44 @@ pipeline {
             }
         }
 
-    stage('Push Build Info to Octopus') {
-        steps {
-            octopusPushBuildInformation(
-                serverId: 'octopus-server',          // Your Octopus server ID
-                spaceId: 'firefist',                 // Your Octopus space ID
-                toolId: 'OctoCLI',                   // Octopus CLI tool ID
-                packageId: 'MyProject/hello-world',  // Updated Package ID to match JFrog format
-                packageVersion: "${PACKAGE_VERSION}",
-                commentParser: '',                   // Leave blank if you're not using issue tracking
-                overwriteMode: 'OverwriteExisting'   // Allow Jenkins to overwrite build info if needed
-                additionalArgs: '--project "helloworld"
-        )
-    }
-}
+        stage('Generate Build Info JSON') {
+            steps {
+                script {
+                    // Generate build info JSON dynamically including Git commit hash
+                    writeFile file: 'build-info.json', text: """{
+                        "Version": "${PACKAGE_VERSION}",
+                        "PackageId": "MyProject/hello-world",
+                        "BuildEnvironment": "Jenkins",
+                        "BuildNumber": "${env.BUILD_NUMBER}",
+                        "Branch": "${env.GIT_BRANCH ? env.GIT_BRANCH : 'main'}",
+                        "VcsType": "Git",
+                        "VcsRoot": "https://github.com/Venu-DevTools/Git-Jen-Jfrog-OD.git",
+                        "VcsCommitNumber": "${env.GIT_COMMIT}",
+                        "ProjectID": "zeta",
+                        "System": "Lota",
+                        "Service": "Kappa"
+                    }"""
+                }
+            }
+        }
 
+        stage('Push Build Info to Octopus') {
+            steps {
+                script {
+                    // Now push the generated JSON file to Octopus
+                    octopusPushBuildInformation(
+                        serverId: 'octopus-server',  // Your Octopus server ID
+                        spaceId: 'firefist',         // Your Octopus space ID
+                        toolId: 'OctoCLI',           // Octopus CLI tool ID
+                        packageId: 'MyProject/hello-world',
+                        packageVersion: "${PACKAGE_VERSION}",
+                        commentParser: '',
+                        overwriteMode: 'OverwriteExisting',
+                        additionalArgs: '--file="build-info.json"'
+                    )
+                }
+            }
+        }
 
         stage('Archive JAR') {
             steps {
@@ -68,3 +90,4 @@ pipeline {
         }
     }
 }
+
