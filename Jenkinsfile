@@ -19,7 +19,7 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                sh "${MAVEN_HOME}/bin/mvn clean install -Djar.finalName=${PROJECT_NAME}.${BUILD_NUMBER}"
+                sh "${MAVEN_HOME}/bin/mvn clean install -Djar.finalName=${PROJECT_NAME}_${BUILD_NUMBER}"
             }
         }
 
