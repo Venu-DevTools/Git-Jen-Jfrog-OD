@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
  
     <groupId>DevTools</groupId>
-    <artifactId>hello-world</artifactId>
+    <artifactId>hello-world</artifactId> 
     <version>1.0.0</version>
 
     <build>
