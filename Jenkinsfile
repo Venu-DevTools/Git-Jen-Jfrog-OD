@@ -3,6 +3,7 @@ pipeline {
 
     environment { 
         PROJECT_NAME = "allen"                         // Project name
+        REPO_NAME="odtest"                               //Repo name
         MAVEN_HOME = tool 'Maven'                      // Maven tool name in Jenkins
         ARTIFACT_NAME = "${PROJECT_NAME}_${BUILD_NUMBER}.jar"
         JFROG_REPO = "odtesting"                       // Actual JFrog repo name
@@ -45,7 +46,7 @@ pipeline {
                         "files": [
                             {
                                 "pattern": "target/${ARTIFACT_NAME}",
-                                "target": "nets/${JFROG_REPO}/${branch}/${BUILD_NUMBER}/${ARTIFACT_NAME}"
+                                "target": "${JFROG_REPO}/nets/${REPO_NAME}/${branch}/${BUILD_NUMBER}/${ARTIFACT_NAME}"
                             }
                         ]
                     }"""
