@@ -37,7 +37,7 @@ pipeline {
             steps {
                 script {
                     // Initialize the server with the JFrog URL
-                    def server = Artifactory.server($JFROG_URL)  // Use the JFrog URL
+                    def server = Artifactory.server(http://130.131.164.192:8082)  // Use the JFrog URL
                     def buildInfo = Artifactory.newBuildInfo()
  
                     // Get clean branch name (e.g., 'refs/heads/main' → 'main')
