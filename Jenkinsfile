@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment { 
-        PROJECT_NAME = "allen"                         // Project name
-        REPO_NAME="odtest"                               //Repo name
-        MAVEN_HOME = tool 'Maven'                      // Maven tool name in Jenkins
+        PROJECT_NAME = "allen"                            // Project name
+        REPO_NAME = "odtest"                              // Folder-style repo path prefix
+        MAVEN_HOME = tool 'Maven'                         // Maven tool name in Jenkins
         ARTIFACT_NAME = "${PROJECT_NAME}_${BUILD_NUMBER}.jar"
-        JFROG_REPO = "odtesting"                       // Actual JFrog repo name
+        JFROG_REPO = "odtesting"                          // Actual JFrog repo name
     }
 
     stages {
@@ -33,20 +33,20 @@ pipeline {
         stage('Deploy to JFrog Artifactory') {
             steps {
                 script {
-                    def server = Artifactory.server('JFrog')  // JFrog instance ID
+                    def server = Artifactory.server('JFrog')  // Jenkins Artifactory server ID
                     def buildInfo = Artifactory.newBuildInfo()
 
-                    // Get clean branch name (e.g., 'refs/heads/main' → 'main')
-                    def branch = env.GIT_BRANCH?.replaceFirst(/^refs\/heads\//, '') ?: 'unknown'
+                    // Clean branch name from env.GIT_BRANCH
+                    def rawBranch = env.GIT_BRANCH ?: 'origin/main'
+                    def branch = rawBranch.replaceAll(/^refs\/heads\//, '').replaceAll(/^origin\//, '')
 
-                    // Print the upload path for debugging
-                    echo "Uploading to: nets/${JFROG_REPO}/${branch}/${BUILD_NUMBER}/${ARTIFACT_NAME}"
+                    echo "Uploading to: nets/${REPO_NAME}/${branch}/${BUILD_NUMBER}/${ARTIFACT_NAME}"
 
                     def uploadSpec = """{
                         "files": [
                             {
                                 "pattern": "target/${ARTIFACT_NAME}",
-                                "target": "${JFROG_REPO}/nets/${REPO_NAME}/${branch}/${BUILD_NUMBER}/${ARTIFACT_NAME}"
+                                "target": "${JFROG_REPO}/nets/${REPO_NAME}/${branch}/${BUILD_NUMBER}/"
                             }
                         ]
                     }"""
