@@ -45,7 +45,7 @@ pipeline {
                     def uploadSpec = """{
                         "files": [
                             {
-                                "pattern": "target/${ARTIFACT_NAME}",
+                                "pattern": "target/",
                                 "target": "${JFROG_REPO}/nets/${REPO_NAME}/${branch}/${BUILD_NUMBER}/"
                             }
                         ]
