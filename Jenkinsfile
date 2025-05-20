@@ -5,7 +5,7 @@ pipeline {
         PROJECT_NAME = "allen"                            // Project name
         REPO_NAME = "odtest"                              // Folder-style repo path prefix
         MAVEN_HOME = tool 'Maven'                         // Maven tool name in Jenkins
-        ARTIFACT_NAME = "${PROJECT_NAME}_${BUILD_NUMBER}.jar"
+        ARTIFACT_NAME = "${PROJECT_NAME}.jar"
         JFROG_REPO = "odtesting"                          // Actual JFrog repo name
     }
  
@@ -20,7 +20,7 @@ pipeline {
  
         stage('Build with Maven') {
             steps {
-                sh "${MAVEN_HOME}/bin/mvn clean install -Djar.finalName=${PROJECT_NAME}_${BUILD_NUMBER}"
+                sh "${MAVEN_HOME}/bin/mvn clean install -Djar.finalName=${PROJECT_NAME}"
             }
         }
  
